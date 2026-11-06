@@ -187,7 +187,7 @@ def build_dynamic_description(
     sections = []
 
     # 1. Header & Live Stats
-    stats_section = f"""🔥 THIS VIDEO'S TITLE & DESCRIPTION UPDATE AUTOMATICALLY EVERY 30 SECONDS!
+    stats_section = f"""🔥 VIDEO STATS ARE CHECKED EVERY 30 SECONDS; METADATA UPDATES WHEN NEEDED.
 
 📊 LIVE VIDEO STATS:
 • 👁️ Current Views    : {views:,}
@@ -243,26 +243,40 @@ def build_dynamic_description(
     return "\n\n".join(sections)
 
 
-def process_smart_comment_replies(youtube, video_id: str, views: int, total_comments: int, github_url: str):
+def process_smart_comment_replies(
+    youtube,
+    video_id: str,
+    views: int,
+    total_comments: int,
+    github_url: str,
+    comments: list | None = None,
+):
     """
     Auto-replies to every new comment with personalized details:
     Author name, commenter #, views at the time, heart ❤️, and GitHub link.
     """
     replied_ids = load_replied_comments()
     try:
-        response = youtube.commentThreads().list(
-            part="snippet",
-            videoId=video_id,
-            maxResults=15,
-            order="time"
-        ).execute()
+        if comments is None:
+            response = youtube.commentThreads().list(
+                part="snippet",
+                videoId=video_id,
+                maxResults=30,
+                order="time",
+                textFormat="plainText"
+            ).execute()
+            comments = []
+            for item in response.get("items", []):
+                top_obj = item.get("snippet", {}).get("topLevelComment", {})
+                comment_snippet = top_obj.get("snippet", {})
+                comments.append({
+                    "id": top_obj.get("id"),
+                    "author": comment_snippet.get("authorDisplayName", "User"),
+                })
 
-        items = response.get("items", [])
-        for item in items:
-            top_obj = item.get("snippet", {}).get("topLevelComment", {})
-            comment_id = top_obj.get("id")
-            s = top_obj.get("snippet", {})
-            author = s.get("authorDisplayName", "User")
+        for comment in comments:
+            comment_id = comment.get("id")
+            author = comment.get("author", "User")
 
             if comment_id and comment_id not in replied_ids:
                 logger.info("New comment detected from %s. Sending smart personalized reply...", author)

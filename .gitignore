@@ -21,3 +21,10 @@ Thumbs.db
 
 # Large binaries
 sample.mp4
+
+# OAuth credentials and private runtime state
+client_secret*.json
+client_secrets.json
+token.pickle
+token*.pickle
+replied_comments.json

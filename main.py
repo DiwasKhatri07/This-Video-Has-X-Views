@@ -112,8 +112,9 @@ def run_automation():
     global running
     start_time = datetime.now()
 
-    # GitHub Actions: Run single cycle and exit
+    # GitHub Actions: Run one read-only metrics cycle and exit.
     run_once = os.getenv("RUN_ONCE", "").lower() in ("true", "1", "yes")
+    metrics_only = os.getenv("METRICS_ONLY", "").lower() in ("true", "1", "yes")
 
     config = load_config()
     video_id = config.get("video_id", "dINikoQUm6k").strip()
@@ -128,7 +129,8 @@ def run_automation():
     logger.info("Watch URL       : https://www.youtube.com/watch?v=%s", video_id)
     logger.info("Check Interval  : %d seconds", check_interval)
     logger.info("GitHub Link     : %s", github_url)
-    logger.info("Auto Reply      : %s", "ENABLED" if auto_reply else "DISABLED")
+    logger.info("Auto Reply      : %s", "ENABLED" if auto_reply and not metrics_only else "DISABLED")
+    logger.info("Metrics-only mode: %s", "ENABLED" if metrics_only else "DISABLED")
     logger.info("Features Active : Top Comment, Latest Comments, Goals, Uptime")
     logger.info("=" * 60)
 
@@ -152,82 +154,88 @@ def run_automation():
             current_title = stats["title"]
             snippet = stats["snippet"]
 
-            # 2. Fetch comments (top liked + latest)
-            comments_data = get_all_comments_data(youtube, video_id, max_results=max_comments)
-            latest_comments = comments_data["latest_comments"]
-            top_comment = comments_data["top_comment"]
-            current_comment_ids = [c["id"] for c in latest_comments]
-
-            # 3. Format pure title and dynamic interactive description
-            expected_title = format_dynamic_title(views)
-            expected_desc = build_dynamic_description(
-                views=views,
-                likes=likes,
-                comments_count=comments_count,
-                latest_comments=latest_comments,
-                top_comment=top_comment,
-                github_url=github_url,
-                start_time=start_time,
-                config=config
-            )
-
-            # 4. Check if updates are needed
-            # We update if stats changed, new comments arrived, title needs fix, or periodically for uptime
-            needs_update = (
-                views != last_views
-                or likes != last_likes
-                or comments_count != last_comment_count
-                or current_comment_ids != last_latest_comment_ids
-                or current_title != expected_title
-                or (cycle % 10 == 0)  # Refresh uptime every 5 minutes (10 cycles * 30s)
-            )
-
-            if needs_update:
+            if metrics_only:
+                # Scheduled Actions updates GitHub's public metrics only. The VPS daemon
+                # owns YouTube metadata edits and comment replies.
+                if sync_github_metrics:
+                    sync_github_metrics(views, likes, comments_count, video_id)
                 logger.info(
-                    "[Cycle #%d] 🔄 Updating Metadata -> Views: %d | Likes: %d | Comments: %d",
+                    "[Cycle #%d] Metrics-only sync | Views: %d | Likes: %d | Comments: %d",
                     cycle, views, likes, comments_count
                 )
-                logger.info("Title: '%s'", expected_title)
-
-                success = update_video_metadata(
-                    youtube,
-                    video_id=video_id,
-                    new_title=expected_title,
-                    new_description=expected_desc,
-                    current_snippet=snippet
-                )
-
-                if success:
-                    logger.info("[Cycle #%d] ✅ Title and Description updated successfully!", cycle)
-                    last_views = views
-                    last_likes = likes
-                    last_comment_count = comments_count
-                    last_latest_comment_ids = current_comment_ids
-
-                    # Sync live metrics to GitHub files (badges, metrics.json, README)
-                    if sync_github_metrics:
-                        try:
-                            sync_github_metrics(views, likes, comments_count, video_id)
-                        except Exception as sync_err:
-                            logger.warning("Could not sync GitHub metrics: %s", sync_err)
-                else:
-                    logger.warning("[Cycle #%d] ⚠️ Update did not confirm.", cycle)
             else:
-                logger.info(
-                    "[Cycle #%d] 🟢 Up-to-date | Views: %d | Likes: %d | Comments: %d | Title: '%s'",
-                    cycle, views, likes, comments_count, current_title
+                # Fetch comments once; reuse them for the description and auto-replies.
+                comments_data = get_all_comments_data(youtube, video_id, max_results=max_comments)
+                latest_comments = comments_data["latest_comments"]
+                top_comment = comments_data["top_comment"]
+                current_comment_ids = [c["id"] for c in latest_comments]
+
+                expected_title = format_dynamic_title(views)
+                expected_desc = build_dynamic_description(
+                    views=views,
+                    likes=likes,
+                    comments_count=comments_count,
+                    latest_comments=latest_comments,
+                    top_comment=top_comment,
+                    github_url=github_url,
+                    start_time=start_time,
+                    config=config
                 )
 
-                # Ensure initial sync even if stats haven't changed
-                if cycle == 1 and sync_github_metrics:
-                    try:
-                        sync_github_metrics(views, likes, comments_count, video_id)
-                    except Exception:
-                        pass
+                # Avoid a periodic write-only refresh. videos.update costs 50 quota
+                # units; update only when data or the title actually changes.
+                needs_update = (
+                    views != last_views
+                    or likes != last_likes
+                    or comments_count != last_comment_count
+                    or current_comment_ids != last_latest_comment_ids
+                    or current_title != expected_title
+                )
 
-            # 5. Smart personalized comment replies (with Heart ❤️ and viewer #)
-            if auto_reply:
-                process_smart_comment_replies(youtube, video_id, views, comments_count, github_url)
+                if needs_update:
+                    logger.info(
+                        "[Cycle #%d] 🔄 Updating Metadata -> Views: %d | Likes: %d | Comments: %d",
+                        cycle, views, likes, comments_count
+                    )
+                    logger.info("Title: '%s'", expected_title)
+
+                    success = update_video_metadata(
+                        youtube,
+                        video_id=video_id,
+                        new_title=expected_title,
+                        new_description=expected_desc,
+                        current_snippet=snippet
+                    )
+
+                    if success:
+                        logger.info("[Cycle #%d] ✅ Title and Description updated successfully!", cycle)
+                        last_views = views
+                        last_likes = likes
+                        last_comment_count = comments_count
+                        last_latest_comment_ids = current_comment_ids
+
+                        # Keep local metric files in sync unless this host is configured
+                        # to leave publishing to the scheduled GitHub Actions workflow.
+                        metrics_sync_enabled = os.getenv("SYNC_GITHUB_METRICS", "true").lower() not in ("false", "0", "no")
+                        if sync_github_metrics and metrics_sync_enabled:
+                            try:
+                                sync_github_metrics(views, likes, comments_count, video_id)
+                            except Exception as sync_err:
+                                logger.warning("Could not sync GitHub metrics: %s", sync_err)
+                    else:
+                        logger.warning("[Cycle #%d] ⚠️ Update did not confirm.", cycle)
+                else:
+                    logger.info(
+                        "[Cycle #%d] 🟢 Up-to-date | Views: %d | Likes: %d | Comments: %d | Title: '%s'",
+                        cycle, views, likes, comments_count, current_title
+                    )
+
+                # Reuse the fetched comment list to avoid a second API read per cycle.
+                if auto_reply:
+                    process_smart_comment_replies(
+                        youtube, video_id, views, comments_count, github_url,
+                        comments=comments_data["raw_comments"]
+                    )
 
         except HttpError as api_err:
             logger.error("[API ERROR] %s. Sleeping for %ds...", api_err, check_interval)

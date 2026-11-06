@@ -47,17 +47,30 @@ def sync_github_metrics(views: int, likes: int, comments: int, video_id: str = "
     3. README.md live table block
     """
     now_utc = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+    metrics_path = "metrics.json"
+    previous_metrics = {}
+    if os.path.exists(metrics_path):
+        try:
+            with open(metrics_path, "r", encoding="utf-8") as f:
+                loaded_metrics = json.load(f)
+                if isinstance(loaded_metrics, dict):
+                    previous_metrics = loaded_metrics
+        except (OSError, json.JSONDecodeError):
+            previous_metrics = {}
 
-    # 1. Update metrics.json
-    metrics = {
+    values = {
         "video_id": video_id,
         "views": views,
         "likes": likes,
         "comments": comments,
         "title": f"This Video Has {views} Views",
-        "last_updated": now_utc
     }
-    with open("metrics.json", "w", encoding="utf-8") as f:
+    values_changed = any(previous_metrics.get(key) != value for key, value in values.items())
+    last_updated = now_utc if values_changed else previous_metrics.get("last_updated", now_utc)
+    metrics = {**values, "last_updated": last_updated}
+
+    # 1. Update metrics.json; preserve its timestamp while values are unchanged.
+    with open(metrics_path, "w", encoding="utf-8") as f:
         json.dump(metrics, f, indent=2)
 
     # 2. Update SVG badges
@@ -80,7 +93,7 @@ def sync_github_metrics(views: int, likes: int, comments: int, video_id: str = "
 | **Video Likes** | **`{likes:,}`** | Active |
 | **Total Comments** | **`{comments:,}`** | Live |
 | **Current Title** | **`This Video Has {views} Views`** | Active |
-| **Last Synchronized** | `{now_utc}` | Automated |
+| **Last Data Change** | `{last_updated}` | Checked every 5 min |
 <!-- LIVE_METRICS_END -->"""
 
             pattern = r"<!-- LIVE_METRICS_START -->.*?<!-- LIVE_METRICS_END -->"

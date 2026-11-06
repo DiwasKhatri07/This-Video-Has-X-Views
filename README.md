@@ -47,13 +47,13 @@ The statistics below are synchronized directly with the live YouTube video every
 ```mermaid
 flowchart LR
     A[YouTube Video] -->|View Count & Comments| B(YouTube Data API v3)
-    B -->|Fetch Metrics| C[Python Automation Daemon]
+    B -->|30-second polling| C[VPS systemd daemon]
     C -->|Update Title: 'This Video Has X Views'| B
     C -->|Auto-Reply with ❤️ & GitHub link| B
     C -->|Update Description Dashboard| B
-    C -->|Sync Badges & README| D[GitHub Repository]
-    D -->|Every 5 Minutes Cron| E[GitHub Actions Runner]
-    E -->|Execute Sync Cycle| C
+    D[GitHub Repository] -->|Every 5 minutes, best effort| E[GitHub Actions]
+    E -->|Read-only metrics cycle| B
+    E -->|Commit changed badges and README| D
 ```
 
 ---
@@ -126,12 +126,11 @@ All parameters are managed through `config.json` with zero required CLI prompts:
 
 ## Deployment
 
-### Option A: GitHub Actions (Free & Continuous)
+### Option A: GitHub Actions (five-minute GitHub metrics)
 
-The repository includes a ready-to-run GitHub Actions workflow (`.github/workflows/youtube-updater.yml`) that runs every 5 minutes:
-1. Fork or push this repository to GitHub.
-2. The workflow automatically executes using the stored credentials.
-3. If views or stats change, GitHub Actions commits the updated badges and README table back to the repository.
+The workflow (`.github/workflows/youtube-updater.yml`) polls YouTube stats about every five minutes and commits metrics only when values change. Each workflow execution runs one cycle and exits; that is expected. GitHub Actions is not an always-on host and does not provide 30-second scheduling. Scheduled starts can also be delayed.
+
+Add a repository Actions secret named `YOUTUBE_TOKEN_PICKLE_B64` containing the base64-encoded OAuth token file. Never commit `token.pickle` or `client_secret.json`. Rotate/revoke any OAuth credentials that were previously published before relying on the new secret.
 
 ### Option B: Server Panels (Pterodactyl / aaPanel / cPanel)
 
@@ -142,23 +141,32 @@ The repository includes a ready-to-run GitHub Actions workflow (`.github/workflo
    ```
 3. The daemon will start immediately and poll every 30 seconds.
 
-### Option C: Linux VPS (Systemd Service)
+### Option C: Linux VPS (Systemd Service — always-on 30-second checks)
 
-1. Transfer files to `/opt/youtube-views`:
+1. Clone the project on the VPS:
    ```bash
-   scp -r . root@<SERVER_IP>:/opt/youtube-views
+   sudo git clone https://github.com/DiwasKhatri07/This-Video-Has-X-Views.git /opt/youtube-views
    ```
-2. Execute the automated installer:
+2. Copy the OAuth token file from a trusted local machine separately; do not add it to Git:
+   ```bash
+   scp token.pickle root@<SERVER_IP>:/opt/youtube-views/token.pickle
+   ssh root@<SERVER_IP> "chmod 600 /opt/youtube-views/token.pickle"
+   ```
+3. Set `check_interval` to `30` in `config.json`, then execute the automated installer:
    ```bash
    cd /opt/youtube-views
    chmod +x deploy_vps.sh
    sudo ./deploy_vps.sh
    ```
-3. Monitor logs and service state:
+4. Monitor logs and service state:
    ```bash
    systemctl status youtube-updater
    journalctl -u youtube-updater -f
    ```
+
+The service keeps polling after each cycle and restarts after a crash. It handles YouTube metadata and comment replies. GitHub Actions publishes repository metrics separately every five minutes. After changing the service unit, install it again and reload systemd with `sudo systemctl daemon-reload && sudo systemctl restart youtube-updater`.
+
+Pushing code to GitHub does not by itself update an already-running VPS. Pull the code on the VPS and restart the service, or configure a separate SSH deployment workflow with VPS host/user/key secrets.
 
 ### Option D: Local Development
 
@@ -188,7 +196,7 @@ YouTube Data API v3 provides a complimentary tier of **10,000 quota units per da
 - `videos.update` (updating title/description): **50 units**
 - `comments.insert` (auto-replying): **50 units**
 
-The script optimizes quota consumption by only executing update operations when a metric has actually changed. In GitHub Actions (5-minute intervals), total daily usage remains well within free limits (~1,500 units/day).
+The 30-second daemon makes about 5,760 read units per day when it performs one video-stat request and one comment-list request per cycle. The five-minute GitHub metrics workflow adds about 288 stat reads per day. Metadata updates and auto-replies cost 50 units each, so their frequency must remain low enough for the project's daily quota. The daemon now avoids a fixed metadata update every five minutes and reuses the same fetched comments for reply detection. High activity can still exhaust quota; watch Google Cloud's quota dashboard.
 
 ---
 

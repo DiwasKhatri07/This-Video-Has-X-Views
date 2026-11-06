@@ -10,6 +10,7 @@ ExecStart=/opt/youtube-views/.venv/bin/python main.py
 Restart=always
 RestartSec=10
 Environment=PYTHONUNBUFFERED=1
+Environment=SYNC_GITHUB_METRICS=false
 StandardOutput=append:/opt/youtube-views/automation.log
 StandardError=append:/opt/youtube-views/automation.log
 

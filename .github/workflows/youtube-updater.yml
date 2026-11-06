@@ -1,69 +1,87 @@
-name: YouTube Live Stats Updater
+name: YouTube GitHub Metrics Sync
 
 on:
   schedule:
-    - cron: "*/5 * * * *"   # Runs every 5 minutes
-  workflow_dispatch:         # Manual trigger
+    - cron: "*/5 * * * *" # GitHub Actions scheduling is not a 30-second daemon.
+  workflow_dispatch:
   push:
     branches:
       - main
     paths-ignore:
-      - 'README.md'
-      - 'badges/**'
-      - 'metrics.json'
-      - 'replied_comments.json'
+      - "README.md"
+      - "badges/**"
+      - "metrics.json"
+      - "replied_comments.json"
 
 permissions:
   contents: write
 
+concurrency:
+  group: youtube-github-metrics
+  cancel-in-progress: false
+
 jobs:
-  update-youtube:
-    name: Sync YouTube Stats
+  update-metrics:
+    name: Read YouTube stats and sync GitHub metrics
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 1
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: "pip"
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Verify OAuth Token
+      - name: Validate Python syntax
+        run: python -m py_compile main.py title.py auth.py scripts/generate_badges.py
+
+      - name: Restore OAuth token from GitHub secret
+        env:
+          YOUTUBE_TOKEN_PICKLE_B64: ${{ secrets.YOUTUBE_TOKEN_PICKLE_B64 }}
         run: |
-          # If secret is set and non-empty, use it
-          if [ -n "${{ secrets.YOUTUBE_TOKEN_PICKLE_B64 }}" ]; then
-            echo "${{ secrets.YOUTUBE_TOKEN_PICKLE_B64 }}" | base64 -d > token.pickle
-          fi
-          # Check that token.pickle exists and has valid size
-          if [ ! -s token.pickle ]; then
-            echo "Error: token.pickle is missing or 0 bytes!"
+          set -euo pipefail
+          if [[ -z "$YOUTUBE_TOKEN_PICKLE_B64" ]]; then
+            echo "Missing repository secret: YOUTUBE_TOKEN_PICKLE_B64"
             exit 1
           fi
-          echo "token.pickle verified successfully ($(wc -c < token.pickle) bytes)."
+          python - <<'PY'
+          import base64
+          import os
+          from pathlib import Path
 
-      - name: Run YouTube Live Sync
+          encoded = os.environ["YOUTUBE_TOKEN_PICKLE_B64"]
+          token = base64.b64decode(encoded)
+          if not token:
+              raise SystemExit("The configured YouTube token secret decoded to an empty file.")
+          token_path = Path("token.pickle")
+          token_path.write_bytes(token)
+          token_path.chmod(0o600)
+          PY
+
+      - name: Run one read-only metrics cycle
         env:
           RUN_ONCE: "true"
+          METRICS_ONLY: "true"
           PYTHONUNBUFFERED: "1"
         run: python main.py
 
-      - name: Commit & Push Live Metrics to GitHub
+      - name: Commit changed metrics
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add badges/ metrics.json README.md replied_comments.json 2>/dev/null || true
-          if git diff --staged --quiet; then
-            echo "No changes to commit (metrics up-to-date)."
+          git add -- badges/ metrics.json README.md
+          if git diff --cached --quiet; then
+            echo "Metrics are unchanged; no commit needed."
           else
-            git commit -m "Auto-sync live YouTube metrics [skip ci]"
+            git commit -m "Auto-sync YouTube metrics"
             git push origin main
           fi
