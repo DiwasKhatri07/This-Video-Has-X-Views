@@ -1,51 +1,69 @@
-# =============================================================================
-#  🤖 YouTube Live Title Bot — GitHub Actions Workflow
-#  Runs every 5 minutes via cron on GitHub Actions
-#  Fetches live YouTube stats and updates video Title + Description
-# =============================================================================
-
-name: 🤖 YouTube Live Stats Updater
+name: YouTube Live Stats Updater
 
 on:
   schedule:
-    - cron: "*/5 * * * *"   # Every 5 minutes (GitHub Actions cron minimum)
-  workflow_dispatch:         # Manual trigger button from GitHub UI
+    - cron: "*/5 * * * *"   # Runs every 5 minutes
+  workflow_dispatch:         # Manual trigger
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - 'badges/**'
+      - 'metrics.json'
+      - 'replied_comments.json'
+
+permissions:
+  contents: write
 
 jobs:
   update-youtube:
-    name: 📊 Sync YouTube Stats
+    name: Sync YouTube Stats
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 1
 
-      - name: 🐍 Setup Python 3.11
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
 
-      - name: 📦 Install Dependencies
+      - name: Install Dependencies
         run: pip install -r requirements.txt
 
-      - name: 🔐 Restore OAuth Token
-        run: echo "${{ secrets.YOUTUBE_TOKEN_PICKLE_B64 }}" | base64 -d > token.pickle
+      - name: Verify OAuth Token
+        run: |
+          # If secret is set and non-empty, use it
+          if [ -n "${{ secrets.YOUTUBE_TOKEN_PICKLE_B64 }}" ]; then
+            echo "${{ secrets.YOUTUBE_TOKEN_PICKLE_B64 }}" | base64 -d > token.pickle
+          fi
+          # Check that token.pickle exists and has valid size
+          if [ ! -s token.pickle ]; then
+            echo "Error: token.pickle is missing or 0 bytes!"
+            exit 1
+          fi
+          echo "token.pickle verified successfully ($(wc -c < token.pickle) bytes)."
 
-      - name: 🔑 Restore Client Secret
-        run: echo "${{ secrets.YOUTUBE_CLIENT_SECRET_JSON }}" > client_secret.json
-
-      - name: 🚀 Run YouTube Updater (Single Cycle)
+      - name: Run YouTube Live Sync
         env:
           RUN_ONCE: "true"
+          PYTHONUNBUFFERED: "1"
         run: python main.py
 
-      - name: 📤 Save Updated Replied Comments Cache
-        if: always()
+      - name: Commit & Push Live Metrics to GitHub
         run: |
-          if [ -f replied_comments.json ]; then
-            git config user.name "YouTube Bot"
-            git config user.email "bot@diwaskhatri.dev"
-            git add replied_comments.json
-            git diff --cached --quiet || git commit -m "🤖 Auto-update replied comments cache"
-            git push
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add badges/ metrics.json README.md replied_comments.json 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "No changes to commit (metrics up-to-date)."
+          else
+            git commit -m "Auto-sync live YouTube metrics [skip ci]"
+            git push origin main
           fi

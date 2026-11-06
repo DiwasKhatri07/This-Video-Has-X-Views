@@ -1,93 +1,92 @@
 """
-scripts/generate_badges.py — Fetches live YouTube stats and writes JSON + SVG badges.
-Used by GitHub Actions to keep README badges dynamically updated.
+generate_badges.py - Updates SVG badges, metrics.json, and README.md with live YouTube stats.
 """
 
 import os
-import sys
 import json
-
-# Add parent dir to path so we can import auth
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from auth import get_authenticated_service
+import re
+from datetime import datetime
 
 
-def fetch_stats(video_id):
-    youtube = get_authenticated_service()
-    response = youtube.videos().list(
-        part="snippet,statistics",
-        id=video_id
-    ).execute()
+def create_svg_badge(label, value, color, filename):
+    label_w = len(label) * 7 + 12
+    val_w = len(str(value)) * 7 + 14
+    total_w = label_w + val_w
 
-    items = response.get("items", [])
-    if not items:
-        raise ValueError(f"No video found: {video_id}")
-
-    stats = items[0]["statistics"]
-    snippet = items[0]["snippet"]
-    return {
-        "title": snippet.get("title", ""),
-        "views": int(stats.get("viewCount", 0)),
-        "likes": int(stats.get("likeCount", 0)),
-        "comments": int(stats.get("commentCount", 0)),
-    }
-
-
-def create_badge_svg(label, value, color, filename):
-    """Creates a simple shields.io compatible SVG badge."""
-    label_width = len(label) * 7 + 10
-    value_width = len(str(value)) * 7 + 10
-    total_width = label_width + value_width
-
-    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{total_width}" height="20" role="img">
+    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{total_w}" height="20" role="img" aria-label="{label}: {value}">
   <linearGradient id="s" x2="0" y2="100%">
     <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <clipPath id="r"><rect width="{total_width}" height="20" rx="3" fill="#fff"/></clipPath>
+  <clipPath id="r">
+    <rect width="{total_w}" height="20" rx="3" fill="#fff"/>
+  </clipPath>
   <g clip-path="url(#r)">
-    <rect width="{label_width}" height="20" fill="#555"/>
-    <rect x="{label_width}" width="{value_width}" height="20" fill="{color}"/>
-    <rect width="{total_width}" height="20" fill="url(#s)"/>
+    <rect width="{label_w}" height="20" fill="#555"/>
+    <rect x="{label_w}" width="{val_w}" height="20" fill="{color}"/>
+    <rect width="{total_w}" height="20" fill="url(#s)"/>
   </g>
   <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="11">
-    <text x="{label_width/2}" y="14">{label}</text>
-    <text x="{label_width + value_width/2}" y="14">{value}</text>
+    <text x="{label_w / 2}" y="15" fill="#010101" fill-opacity=".3">{label}</text>
+    <text x="{label_w / 2}" y="14">{label}</text>
+    <text x="{label_w + val_w / 2}" y="15" fill="#010101" fill-opacity=".3">{value}</text>
+    <text x="{label_w + val_w / 2}" y="14">{value}</text>
   </g>
 </svg>'''
 
     os.makedirs("badges", exist_ok=True)
-    with open(f"badges/{filename}", "w", encoding="utf-8") as f:
-        f.write(svg)
+    with open(os.path.join("badges", filename), "w", encoding="utf-8") as f:
+        f.write(svg.strip())
 
 
-def main():
-    # Load config
-    config_path = "config.json"
-    if os.path.exists(config_path):
-        with open(config_path, "r") as f:
-            config = json.load(f)
-    else:
-        config = {"video_id": "dINikoQUm6k"}
+def sync_github_metrics(views: int, likes: int, comments: int, video_id: str = "dINikoQUm6k"):
+    """
+    Synchronizes:
+    1. metrics.json
+    2. SVG badges in badges/
+    3. README.md live table block
+    """
+    now_utc = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
 
-    video_id = config.get("video_id", "dINikoQUm6k")
-    stats = fetch_stats(video_id)
-
-    print(f"Fetched Stats — Views: {stats['views']}, Likes: {stats['likes']}, Comments: {stats['comments']}")
-
-    # Save metrics.json
+    # 1. Update metrics.json
+    metrics = {
+        "video_id": video_id,
+        "views": views,
+        "likes": likes,
+        "comments": comments,
+        "title": f"This Video Has {views} Views",
+        "last_updated": now_utc
+    }
     with open("metrics.json", "w", encoding="utf-8") as f:
-        json.dump(stats, f, indent=2)
+        json.dump(metrics, f, indent=2)
 
-    # Generate SVG badges
-    create_badge_svg("views", f"{stats['views']:,}", "#e05d44", "views.svg")
-    create_badge_svg("likes", f"{stats['likes']:,}", "#44cc11", "likes.svg")
-    create_badge_svg("comments", f"{stats['comments']:,}", "#007ec6", "comments.svg")
-    create_badge_svg("bot", "online", "#2ecc71", "status.svg")
+    # 2. Update SVG badges
+    create_svg_badge("views", f"{views:,}", "#e05d44", "views.svg")
+    create_svg_badge("likes", f"{likes:,}", "#44cc11", "likes.svg")
+    create_svg_badge("comments", f"{comments:,}", "#007ec6", "comments.svg")
+    create_svg_badge("bot", "online", "#2ecc71", "status.svg")
 
-    print("Badges generated successfully!")
+    # 3. Update README.md live table if markers exist
+    readme_path = "README.md"
+    if os.path.exists(readme_path):
+        try:
+            with open(readme_path, "r", encoding="utf-8") as f:
+                content = f.read()
 
+            table_replacement = f"""<!-- LIVE_METRICS_START -->
+| Metric | Real-time Value | Status |
+| :--- | :--- | :--- |
+| **YouTube Views** | **`{views:,}`** | Synchronized |
+| **Video Likes** | **`{likes:,}`** | Active |
+| **Total Comments** | **`{comments:,}`** | Live |
+| **Current Title** | **`This Video Has {views} Views`** | Active |
+| **Last Synchronized** | `{now_utc}` | Automated |
+<!-- LIVE_METRICS_END -->"""
 
-if __name__ == "__main__":
-    main()
+            pattern = r"<!-- LIVE_METRICS_START -->.*?<!-- LIVE_METRICS_END -->"
+            if re.search(pattern, content, flags=re.DOTALL):
+                new_content = re.sub(pattern, table_replacement, content, flags=re.DOTALL)
+                with open(readme_path, "w", encoding="utf-8") as f:
+                    f.write(new_content)
+        except Exception as e:
+            print(f"[METRICS] Could not update README table: {e}")

@@ -27,6 +27,11 @@ from title import (
     update_video_metadata
 )
 
+try:
+    from scripts.generate_badges import sync_github_metrics
+except Exception:
+    sync_github_metrics = None
+
 CONFIG_FILE = "config.json"
 LOG_FILE = "automation.log"
 
@@ -198,6 +203,13 @@ def run_automation():
                     last_likes = likes
                     last_comment_count = comments_count
                     last_latest_comment_ids = current_comment_ids
+
+                    # Sync live metrics to GitHub files (badges, metrics.json, README)
+                    if sync_github_metrics:
+                        try:
+                            sync_github_metrics(views, likes, comments_count, video_id)
+                        except Exception as sync_err:
+                            logger.warning("Could not sync GitHub metrics: %s", sync_err)
                 else:
                     logger.warning("[Cycle #%d] ⚠️ Update did not confirm.", cycle)
             else:
@@ -205,6 +217,13 @@ def run_automation():
                     "[Cycle #%d] 🟢 Up-to-date | Views: %d | Likes: %d | Comments: %d | Title: '%s'",
                     cycle, views, likes, comments_count, current_title
                 )
+
+                # Ensure initial sync even if stats haven't changed
+                if cycle == 1 and sync_github_metrics:
+                    try:
+                        sync_github_metrics(views, likes, comments_count, video_id)
+                    except Exception:
+                        pass
 
             # 5. Smart personalized comment replies (with Heart ❤️ and viewer #)
             if auto_reply:

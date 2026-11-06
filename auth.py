@@ -39,12 +39,25 @@ def get_client_secret_path():
 def get_authenticated_service(token_path=TOKEN_PICKLE_FILE):
     """
     Authenticates with YouTube Data API v3.
-    VPS Ready: If token.pickle exists, uses refresh token silently in headless mode.
+    VPS/CI Ready: If token.pickle exists or base64 token env var is set,
+    uses refresh token silently in headless mode.
     """
+    import base64
     creds = None
 
+    # Fallback: Restore token.pickle from environment variable if missing or empty
+    if (not os.path.exists(token_path) or os.path.getsize(token_path) == 0):
+        b64_token = os.getenv("YOUTUBE_TOKEN_PICKLE_B64", "").strip()
+        if b64_token:
+            try:
+                with open(token_path, "wb") as f:
+                    f.write(base64.b64decode(b64_token))
+                logger.info("Restored '%s' from YOUTUBE_TOKEN_PICKLE_B64 environment variable.", token_path)
+            except Exception as e:
+                logger.warning("Failed decoding YOUTUBE_TOKEN_PICKLE_B64: %s", e)
+
     # 1. Load cached credentials
-    if os.path.exists(token_path):
+    if os.path.exists(token_path) and os.path.getsize(token_path) > 100:
         try:
             with open(token_path, "rb") as token_file:
                 creds = pickle.load(token_file)

@@ -1,255 +1,98 @@
 <div align="center">
 
-<!-- Animated Title -->
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=35&pause=1000&color=FF0000&center=true&vCenter=true&multiline=true&width=800&height=100&lines=%F0%9F%94%A5+This+Video+Has+X+Views;YouTube+Real-Time+Automation+Bot" alt="Typing SVG" />
+# YouTube Real-Time Views & Metadata Automation
+
+A lightweight, automated Python service that continuously tracks a YouTube video and dynamically updates its title, description, and GitHub repository metrics in real-time.
+
+[![Watch on YouTube](https://img.shields.io/badge/YouTube-Watch_Live_Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=dINikoQUm6k)
 
 <br/>
 
-<!-- YouTube Video Live Badge -->
-<a href="https://www.youtube.com/watch?v=dINikoQUm6k">
-  <img src="https://img.shields.io/badge/▶_WATCH_LIVE-YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch on YouTube"/>
-</a>
-
-<!-- Live Metrics Badges -->
-<br/><br/>
-<img src="badges/views.svg" alt="Views"/>
-<img src="badges/likes.svg" alt="Likes"/>
-<img src="badges/comments.svg" alt="Comments"/>
-<img src="badges/status.svg" alt="Bot Status"/>
-
-<br/><br/>
-
-<!-- Tech Stack Badges -->
-![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)
-![YouTube API](https://img.shields.io/badge/YouTube_Data_API-v3-FF0000?style=flat-square&logo=youtube&logoColor=white)
-![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-Bot-2088FF?style=flat-square&logo=githubactions&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+[![Views](badges/views.svg)](https://www.youtube.com/watch?v=dINikoQUm6k)
+[![Likes](badges/likes.svg)](https://www.youtube.com/watch?v=dINikoQUm6k)
+[![Comments](badges/comments.svg)](https://www.youtube.com/watch?v=dINikoQUm6k)
+[![Bot Status](badges/status.svg)](#deployment)
 
 <br/>
 
-**A fully automated YouTube bot that dynamically updates your video's Title and Description in real-time based on live view count, likes, comments, and more — running 24/7 via GitHub Actions!**
-
-<br/>
-
-[🚀 Quick Start](#-quick-start) •
-[✨ Features](#-features) •
-[⚙️ Configuration](#%EF%B8%8F-configuration) •
-[🤖 GitHub Actions](#-github-actions-cicd) •
-[📸 Screenshots](#-live-demo) •
-[👨‍💻 Author](#-author)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![YouTube Data API](https://img.shields.io/badge/YouTube_API-v3-red?style=flat-square&logo=youtube&logoColor=white)](https://developers.google.com/youtube/v3)
+[![CI/CD](https://img.shields.io/badge/GitHub_Actions-Automated_Sync-blue?style=flat-square&logo=githubactions&logoColor=white)](.github/workflows/youtube-updater.yml)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
 </div>
 
 ---
 
-## 📸 Live Demo
+## Live Repository & Video Metrics
 
-> **🔴 Watch the bot in action!** The title and description of this video updates automatically:
->
-> ### 👉 [youtube.com/watch?v=dINikoQUm6k](https://www.youtube.com/watch?v=dINikoQUm6k)
+The statistics below are synchronized directly with the live YouTube video every cycle. Whenever views, likes, or comments change on YouTube, GitHub Actions commits the updated metrics back to this repository.
 
-**What happens when you watch, like, or comment:**
+<!-- LIVE_METRICS_START -->
+| Metric | Real-time Value | Status |
+| :--- | :--- | :--- |
+| **YouTube Views** | **`31`** | Synchronized |
+| **Video Likes** | **`5`** | Active |
+| **Total Comments** | **`19`** | Live |
+| **Current Title** | **`This Video Has 31 Views`** | Active |
+| **Last Synchronized** | `2026-11-06 07:09:45 UTC` | Automated |
+<!-- LIVE_METRICS_END -->
 
-```
-📺 Title Updates:
-   Before: "This Video Has 4 Views"
-   After:  "This Video Has 5 Views"  ← Updates within 30 seconds!
+> **Target Video:** [https://www.youtube.com/watch?v=dINikoQUm6k](https://www.youtube.com/watch?v=dINikoQUm6k)
 
-📝 Description Updates:
-   📊 LIVE VIDEO STATS:
-   • 👁️ Current Views    : 5
-   • 👍 Total Likes      : 3
-   • 💬 Total Comments   : 12
-   • ⏱️ Last Synced      : 2026-11-06 11:30:45
+---
 
-   📈 LIVE COMMUNITY GOALS:
-   • 👍 Likes Goal    : [████████░░] 80% (8/10)
-   • 💬 Comments Goal : [██████░░░░] 60% (12/25)
+## System Architecture
 
-   👑 TOP LIKED COMMENT (HALL OF FAME):
-   • @viewer (5 👍): "This bot is insane!"
-
-   💬 LATEST 3 COMMENTS:
-   • @user1: "Amazing automation!"
-   • @user2: "How does this work?"
-   • @user3: "Mind blown 🤯"
-
-💬 Auto-Reply:
-   "Hey @user1! ❤️ You are commenter #12 (watched when the video had 5 views).
-    Check out my GitHub: https://github.com/diwaskhatri07"
+```mermaid
+flowchart LR
+    A[YouTube Video] -->|View Count & Comments| B(YouTube Data API v3)
+    B -->|Fetch Metrics| C[Python Automation Daemon]
+    C -->|Update Title: 'This Video Has X Views'| B
+    C -->|Auto-Reply with ❤️ & GitHub link| B
+    C -->|Update Description Dashboard| B
+    C -->|Sync Badges & README| D[GitHub Repository]
+    D -->|Every 5 Minutes Cron| E[GitHub Actions Runner]
+    E -->|Execute Sync Cycle| C
 ```
 
 ---
 
-## ✨ Features
+## Core Capabilities
 
-<table>
-<tr>
-<td width="50%">
+### 1. Dynamic Video Title
+The video title automatically adapts to the exact view count:
+```text
+This Video Has 13 Views
+```
+No extraneous text or mentions are added to the title, keeping it clean and accurate.
 
-### 🎯 Core Features
-- **Dynamic Title** — Updates to `This Video Has X Views` every 30 seconds
-- **Live Description Dashboard** — Real-time Views, Likes, Comments counter
-- **Auto Comment Reply** — Personalized reply with ❤️, commenter #, and GitHub link
-- **Smart Caching** — Only calls YouTube update API when stats actually change
+### 2. Live Description Dashboard
+Every update cycle formats a live engagement board inside the YouTube video description:
+- Real-time counters: Total Views, Likes, and Comments.
+- **Top Liked Comment (Hall of Fame)**: Highlights the most-liked viewer comment.
+- **Latest 3 Comments**: Automatically displays recent comments and author handles.
+- **Community Progress Goals**: Visual ASCII bars tracking progress toward like and comment targets.
+- **Milestone Tracker**: Checklist celebrating 1, 5, 25, 100, 500, and 1,000+ views.
+- **Creator Reference**: Permanent link to creator GitHub profile.
 
-</td>
-<td width="50%">
+### 3. Personalized Auto-Replies
+When viewers post a comment, the bot identifies unreplied entries and responds directly:
+```text
+Hey @username! ❤️ Thanks for commenting on this video!
+You are commenter #15 (watched when the video had 13 views).
+Check out my GitHub: https://github.com/diwaskhatri07
+```
+A local cache (`replied_comments.json`) ensures no comment receives duplicate replies.
 
-### 🔥 Advanced Features
-- **👑 Top Comment Hall of Fame** — Most liked comment gets featured
-- **📊 ASCII Progress Bars** — Visual like & comment goals
-- **⏳ Live Bot Uptime** — Shows how long the bot has been active
-- **🏆 Milestone Tracker** — Checkbox for 1, 5, 25, 100, 500, 1K views
-
-</td>
-</tr>
-</table>
-
-### 🤖 Deployment Options
-
-| Platform | Status | Description |
-|----------|--------|-------------|
-| **GitHub Actions** | ✅ Recommended | Free, runs every 5 minutes via cron |
-| **Pterodactyl Panel** | ✅ Supported | For game hosting panels |
-| **Docker / VPS** | ✅ Supported | For self-hosted servers |
-| **Local PC** | ✅ Supported | For development and testing |
+### 4. Live GitHub Sync
+The bot synchronizes the repository's `metrics.json`, SVG status badges (`badges/views.svg`, `badges/likes.svg`, `badges/comments.svg`), and the live README table on every change.
 
 ---
 
-## 📁 Project Structure
+## Configuration
 
-```
-📦 youtube-live-view-counter/
-├── 🤖 .github/
-│   └── workflows/
-│       ├── youtube-updater.yml      # ← Main bot: runs every 5 min
-│       └── update-badges.yml        # ← Live metrics badge generator
-├── 📊 badges/
-│   ├── views.svg                    # Live view count badge
-│   ├── likes.svg                    # Live like count badge
-│   ├── comments.svg                 # Live comment count badge
-│   └── status.svg                   # Bot online status badge
-├── 🔧 scripts/
-│   └── generate_badges.py           # Badge SVG generator
-├── 🐍 auth.py                       # OAuth 2.0 authentication
-├── 🐍 title.py                      # Stats engine + description builder
-├── 🐍 main.py                       # Core automation daemon
-├── 🐍 generate_video.py             # Sample video generator (OpenCV)
-├── ⚙️ config.json                   # All bot settings (zero-input)
-├── 📊 metrics.json                  # Latest fetched metrics
-├── 🐳 Dockerfile                    # Docker deployment
-├── 🐳 docker-compose.yml            # Docker Compose config
-├── 🔧 deploy_vps.sh                 # One-click VPS deployment
-├── 🔧 youtube-updater.service       # Systemd service file
-├── 📜 requirements.txt              # Python dependencies
-├── 📜 LICENSE                        # MIT License
-└── 📖 README.md                     # You are here!
-```
-
----
-
-## 🚀 Quick Start
-
-### Option 1: GitHub Actions (Recommended — Free & Always On)
-
-> **No server needed!** GitHub Actions runs the bot for free.
-
-**Step 1:** Fork this repository
-
-**Step 2:** Set up YouTube API credentials ([detailed guide below](#-youtube-api-setup))
-
-**Step 3:** Add GitHub Secrets:
-
-| Secret Name | Value |
-|------------|-------|
-| `YOUTUBE_TOKEN_PICKLE_B64` | Base64 encoded `token.pickle` |
-| `YOUTUBE_CLIENT_SECRET_JSON` | Contents of `client_secret.json` |
-
-```bash
-# Generate base64 of your token.pickle:
-base64 -w 0 token.pickle
-# (On Windows PowerShell):
-[Convert]::ToBase64String([IO.File]::ReadAllBytes("token.pickle"))
-```
-
-**Step 4:** Enable GitHub Actions in your fork → The bot will start automatically!
-
----
-
-### Option 2: Local / Server Panel / VPS
-
-```bash
-# Clone the repo
-git clone https://github.com/DiwasKhatri07/youtube-live-view-counter.git
-cd youtube-live-view-counter
-
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate   # Linux/Mac
-.\.venv\Scripts\activate    # Windows
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Place your client_secret.json and token.pickle in this directory
-
-# Run the bot!
-python main.py
-```
-
----
-
-## 🔑 YouTube API Setup
-
-<details>
-<summary><b>📋 Click to expand step-by-step guide</b></summary>
-
-### 1. Create a Google Cloud Project
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project (e.g., `YouTube-Bot`)
-
-### 2. Enable YouTube Data API v3
-1. Navigate to **APIs & Services** → **Library**
-2. Search for **YouTube Data API v3**
-3. Click **Enable**
-
-### 3. Create OAuth 2.0 Credentials
-1. Go to **APIs & Services** → **Credentials**
-2. Click **+ CREATE CREDENTIALS** → **OAuth client ID**
-3. Application type: **Desktop app**
-4. Download the JSON file → rename to `client_secret.json`
-
-### 4. Configure OAuth Consent Screen
-1. Go to **APIs & Services** → **OAuth consent screen**
-2. Select **External** → Fill in required details
-3. Under **Test users**, add your Gmail address
-4. Click **PUBLISH APP** (to remove testing restrictions)
-
-### 5. Generate token.pickle
-```bash
-# Run once on your local PC to authenticate via browser:
-python auth.py
-# This opens a browser for Google login.
-# After login, token.pickle is generated automatically!
-```
-
-### 6. Upload to GitHub Secrets (for GitHub Actions)
-```bash
-# Base64 encode token.pickle:
-base64 -w 0 token.pickle
-# Copy the output → Add as GitHub Secret: YOUTUBE_TOKEN_PICKLE_B64
-
-# Copy client_secret.json content → Add as GitHub Secret: YOUTUBE_CLIENT_SECRET_JSON
-```
-
-</details>
-
----
-
-## ⚙️ Configuration
-
-All settings are in `config.json` — **zero manual input required**:
+All parameters are managed through `config.json` with zero required CLI prompts:
 
 ```json
 {
@@ -265,145 +108,99 @@ All settings are in `config.json` — **zero manual input required**:
 }
 ```
 
-| Key | Type | Description |
-|-----|------|-------------|
-| `video_id` | `string` | Your YouTube Video ID |
-| `check_interval` | `int` | Seconds between each check (default: `30`) |
-| `github_url` | `string` | Your GitHub profile URL |
-| `auto_reply_enabled` | `bool` | Auto-reply to new comments with ❤️ |
-| `show_top_comment` | `bool` | Show 👑 most-liked comment in description |
-| `show_latest_comments` | `bool` | Show latest 3 comments in description |
-| `show_progress_bars` | `bool` | Show ASCII like & comment goal bars |
-| `show_uptime_and_milestones` | `bool` | Show bot uptime and milestone checklist |
-| `max_comments_in_description` | `int` | Number of recent comments to feature |
+### Configuration Parameters
+
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `video_id` | `string` | `"dINikoQUm6k"` | Target YouTube video identifier |
+| `check_interval` | `integer` | `30` | Polling frequency in seconds (panel / daemon mode) |
+| `github_url` | `string` | `"https://github.com/diwaskhatri07"` | Creator profile link inserted in replies and description |
+| `auto_reply_enabled` | `boolean` | `true` | Enables personalized responses to viewer comments |
+| `show_top_comment` | `boolean` | `true` | Features most-liked comment in description |
+| `show_latest_comments` | `boolean` | `true` | Includes recent comments in description |
+| `show_progress_bars` | `boolean` | `true` | Displays ASCII goal bars for likes and comments |
+| `show_uptime_and_milestones` | `boolean` | `true` | Displays runtime uptime and view milestone checklist |
+| `max_comments_in_description` | `integer` | `3` | Maximum number of recent comments to list |
 
 ---
 
-## 🤖 GitHub Actions CI/CD
+## Deployment
 
-### Workflows
+### Option A: GitHub Actions (Free & Continuous)
 
-| Workflow | Schedule | Purpose |
-|----------|----------|---------|
-| `youtube-updater.yml` | Every 5 minutes | Fetches YouTube stats, updates title, description, and auto-replies |
-| `update-badges.yml` | Every 10 minutes | Generates live SVG metric badges for README |
+The repository includes a ready-to-run GitHub Actions workflow (`.github/workflows/youtube-updater.yml`) that runs every 5 minutes:
+1. Fork or push this repository to GitHub.
+2. The workflow automatically executes using the stored credentials.
+3. If views or stats change, GitHub Actions commits the updated badges and README table back to the repository.
 
-> **ℹ️ Note:** GitHub Actions cron has a minimum interval of 5 minutes. For 30-second updates, use a VPS or server panel.
+### Option B: Server Panels (Pterodactyl / aaPanel / cPanel)
 
-### Required GitHub Secrets
+1. Upload the project files to your server panel directory.
+2. Set the startup command:
+   ```bash
+   python main.py
+   ```
+3. The daemon will start immediately and poll every 30 seconds.
 
-| Secret | How to Get |
-|--------|-----------|
-| `YOUTUBE_TOKEN_PICKLE_B64` | `base64 -w 0 token.pickle` |
-| `YOUTUBE_CLIENT_SECRET_JSON` | Contents of `client_secret.json` |
+### Option C: Linux VPS (Systemd Service)
 
----
+1. Transfer files to `/opt/youtube-views`:
+   ```bash
+   scp -r . root@<SERVER_IP>:/opt/youtube-views
+   ```
+2. Execute the automated installer:
+   ```bash
+   cd /opt/youtube-views
+   chmod +x deploy_vps.sh
+   sudo ./deploy_vps.sh
+   ```
+3. Monitor logs and service state:
+   ```bash
+   systemctl status youtube-updater
+   journalctl -u youtube-updater -f
+   ```
 
-## 📊 API Quota & Safety
-
-| Metric | Value |
-|--------|-------|
-| YouTube Daily Quota | 10,000 units/day (free) |
-| `videos.list` cost | 1 unit per call |
-| `videos.update` cost | 50 units per call |
-| `commentThreads.list` cost | 1 unit per call |
-| `comments.insert` cost | 50 units per call |
-| **GitHub Actions (5 min interval)** | ~300 list + ~50 updates = **~2,800 units/day** ✅ |
-| **Panel/VPS (30 sec interval)** | ~2,880 list + ~200 updates = **~12,880 units/day** ⚠️ |
-
-> 💡 **Smart Optimization**: The bot only calls `videos.update` when stats actually change, significantly reducing quota usage.
-
----
-
-## 🐳 Docker Deployment
+### Option D: Local Development
 
 ```bash
-# Build and run
-docker compose up -d
+# Clone the repository
+git clone https://github.com/DiwasKhatri07/This-Video-Has-X-Views.git
+cd This-Video-Has-X-Views
 
-# View logs
-docker compose logs -f
+# Set up virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .\.venv\Scripts\activate
 
-# Stop
-docker compose down
+# Install requirements
+pip install -r requirements.txt
+
+# Run the automation
+python main.py
 ```
 
 ---
 
-## 🔧 VPS Deployment (Ubuntu/Debian)
+## API Quota Management
 
-```bash
-# Upload files to VPS
-scp -r . root@YOUR_VPS_IP:/opt/youtube-bot
+YouTube Data API v3 provides a complimentary tier of **10,000 quota units per day**:
+- `videos.list` (fetching stats): **1 unit**
+- `commentThreads.list` (reading comments): **1 unit**
+- `videos.update` (updating title/description): **50 units**
+- `comments.insert` (auto-replying): **50 units**
 
-# SSH and run installer
-ssh root@YOUR_VPS_IP
-cd /opt/youtube-bot
-chmod +x deploy_vps.sh
-sudo ./deploy_vps.sh
-
-# Manage
-systemctl status youtube-updater   # Check status
-journalctl -u youtube-updater -f   # Live logs
-systemctl restart youtube-updater  # Restart
-```
+The script optimizes quota consumption by only executing update operations when a metric has actually changed. In GitHub Actions (5-minute intervals), total daily usage remains well within free limits (~1,500 units/day).
 
 ---
 
-## 🛠️ Tech Stack
+## Developer
 
-<div align="center">
-
-| Technology | Purpose |
-|:----------:|:-------:|
-| ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white) | Core Language |
-| ![YouTube](https://img.shields.io/badge/YouTube_API_v3-FF0000?style=for-the-badge&logo=youtube&logoColor=white) | Video Stats & Management |
-| ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white) | CI/CD Automation |
-| ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) | Containerization |
-| ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black) | Server Deployment |
-
-</div>
+**Diwas Khatri**  
+Kathmandu, Nepal  
+- GitHub: [@DiwasKhatri07](https://github.com/DiwasKhatri07)
+- YouTube: [@DiwasOP](https://www.youtube.com/@DiwasOP)
 
 ---
 
-## 👨‍💻 Author
+## License
 
-<div align="center">
-
-<img src="https://github.com/DiwasKhatri07.png" width="120" style="border-radius: 50%;" alt="Diwas Khatri"/>
-
-### **Diwas Khatri** 🇳🇵
-
-*Developer • Automator • Open Source Enthusiast*
-
-[![GitHub](https://img.shields.io/badge/GitHub-DiwasKhatri07-181717?style=for-the-badge&logo=github)](https://github.com/DiwasKhatri07)
-[![YouTube](https://img.shields.io/badge/YouTube-@DiwasOP-FF0000?style=for-the-badge&logo=youtube)](https://www.youtube.com/@DiwasOP)
-
-</div>
-
----
-
-## ⭐ Support
-
-If you found this project interesting or useful:
-
-- 🌟 **Star** this repository
-- 🍴 **Fork** it and create your own version
-- 👁️ **Watch** the [live video](https://www.youtube.com/watch?v=dINikoQUm6k) and leave a comment
-- 💬 **Share** it with your developer friends
-
----
-
-## 📜 License
-
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
-
----
-
-<div align="center">
-
-**Made with ❤️ and 🐍 in Nepal 🇳🇵**
-
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=14&pause=1000&color=888888&center=true&vCenter=true&width=500&lines=Thanks+for+visiting!+Star+⭐+if+you+liked+it!" alt="Footer"/>
-
-</div>
+This project is licensed under the [MIT License](LICENSE).
