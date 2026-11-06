@@ -1,0 +1,10 @@
+services:
+  youtube-automation:
+    build: .
+    container_name: youtube_dynamic_updater
+    restart: unless-stopped
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+      - CHECK_INTERVAL=30

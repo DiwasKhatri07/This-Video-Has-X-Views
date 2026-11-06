@@ -1,0 +1,149 @@
+2026-11-06 10:31:46 [INFO] Loaded credentials from 'token.pickle'.
+2026-11-06 10:32:07 [INFO] Saved video_id 'dINikoQUm6k' to config.json
+2026-11-06 10:32:07 [INFO] ============================================================
+2026-11-06 10:32:07 [INFO] YOUTUBE AUTOMATION DAEMON ONLINE
+2026-11-06 10:32:07 [INFO] Target Video   : https://www.youtube.com/watch?v=dINikoQUm6k
+2026-11-06 10:32:07 [INFO] Sync Interval  : Every 30 seconds
+2026-11-06 10:32:07 [INFO] Log File       : C:\Users\Diwas\Desktop\youtube views\automation.log
+2026-11-06 10:32:07 [INFO] ============================================================
+2026-11-06 10:32:07 [INFO] [Cycle #1] 🔄 Changes Detected -> Views: 4 | Likes: 1 | Comments: 2
+2026-11-06 10:32:07 [INFO] Updating title to: 'This Video Has 4 Views'
+2026-11-06 10:32:09 [INFO] [Cycle #1] ✅ Successfully updated Title and Description!
+2026-11-06 10:32:39 [INFO] [Cycle #2] 🟢 Up-to-date | Views: 4 | Likes: 1 | Comments: 2 (Next check in 30s)
+2026-11-06 10:33:09 [INFO] [Cycle #3] 🟢 Up-to-date | Views: 4 | Likes: 1 | Comments: 2 (Next check in 30s)
+2026-11-06 10:33:39 [INFO] [Cycle #4] 🟢 Up-to-date | Views: 4 | Likes: 1 | Comments: 2 (Next check in 30s)
+2026-11-06 10:34:10 [INFO] [Cycle #5] 🟢 Up-to-date | Views: 4 | Likes: 1 | Comments: 2 (Next check in 30s)
+2026-11-06 10:34:40 [INFO] [Cycle #6] 🟢 Up-to-date | Views: 4 | Likes: 1 | Comments: 2 (Next check in 30s)
+2026-11-06 10:35:10 [INFO] [Cycle #7] 🟢 Up-to-date | Views: 4 | Likes: 1 | Comments: 2 (Next check in 30s)
+2026-11-06 10:35:40 [INFO] [Cycle #8] 🟢 Up-to-date | Views: 4 | Likes: 1 | Comments: 2 (Next check in 30s)
+2026-11-06 10:36:10 [INFO] [Cycle #9] 🟢 Up-to-date | Views: 4 | Likes: 1 | Comments: 2 (Next check in 30s)
+2026-11-06 10:36:41 [INFO] [Cycle #10] 🟢 Up-to-date | Views: 4 | Likes: 1 | Comments: 2 (Next check in 30s)
+2026-11-06 10:37:11 [INFO] [Cycle #11] 🔄 Changes Detected -> Views: 4 | Likes: 1 | Comments: 3
+2026-11-06 10:37:11 [INFO] Updating title to: 'This Video Has 4 Views'
+2026-11-06 10:37:12 [INFO] [Cycle #11] ✅ Successfully updated Title and Description!
+2026-11-06 10:37:42 [INFO] [Cycle #12] 🟢 Up-to-date | Views: 4 | Likes: 1 | Comments: 3 (Next check in 30s)
+2026-11-06 10:38:12 [INFO] [Cycle #13] 🔄 Changes Detected -> Views: 4 | Likes: 2 | Comments: 3
+2026-11-06 10:38:12 [INFO] Updating title to: 'This Video Has 4 Views'
+2026-11-06 10:38:14 [INFO] [Cycle #13] ✅ Successfully updated Title and Description!
+2026-11-06 10:38:44 [INFO] [Cycle #14] 🟢 Up-to-date | Views: 4 | Likes: 2 | Comments: 3 (Next check in 30s)
+2026-11-06 10:39:14 [INFO] [Cycle #15] 🔄 Changes Detected -> Views: 5 | Likes: 2 | Comments: 3
+2026-11-06 10:39:14 [INFO] Updating title to: 'This Video Has 5 Views'
+2026-11-06 10:39:16 [INFO] [Cycle #15] ✅ Successfully updated Title and Description!
+2026-11-06 10:39:26 [INFO] Loaded credentials from 'token.pickle'.
+2026-11-06 10:39:46 [INFO] [Cycle #16] 🟢 Up-to-date | Views: 5 | Likes: 2 | Comments: 3 (Next check in 30s)
+2026-11-06 10:40:16 [INFO] [Cycle #17] 🟢 Up-to-date | Views: 5 | Likes: 2 | Comments: 3 (Next check in 30s)
+2026-11-06 10:40:47 [INFO] [Cycle #18] 🟢 Up-to-date | Views: 5 | Likes: 2 | Comments: 3 (Next check in 30s)
+2026-11-06 10:41:17 [INFO] [Cycle #19] 🔄 Changes Detected -> Views: 5 | Likes: 2 | Comments: 6
+2026-11-06 10:41:17 [INFO] Updating title to: 'This Video Has 5 Views'
+2026-11-06 10:41:18 [INFO] [Cycle #19] ✅ Successfully updated Title and Description!
+2026-11-06 10:41:49 [INFO] [Cycle #20] 🔄 Changes Detected -> Views: 6 | Likes: 2 | Comments: 6
+2026-11-06 10:41:49 [INFO] Updating title to: 'This Video Has 6 Views'
+2026-11-06 10:41:50 [INFO] [Cycle #20] ✅ Successfully updated Title and Description!
+2026-11-06 10:42:20 [INFO] [Cycle #21] 🟢 Up-to-date | Views: 6 | Likes: 2 | Comments: 6 (Next check in 30s)
+2026-11-06 10:42:51 [INFO] [Cycle #22] 🟢 Up-to-date | Views: 6 | Likes: 2 | Comments: 6 (Next check in 30s)
+2026-11-06 10:43:21 [INFO] [Cycle #23] 🟢 Up-to-date | Views: 6 | Likes: 2 | Comments: 6 (Next check in 30s)
+2026-11-06 10:43:51 [INFO] [Cycle #24] 🟢 Up-to-date | Views: 6 | Likes: 2 | Comments: 6 (Next check in 30s)
+2026-11-06 10:44:22 [INFO] [Cycle #25] 🟢 Up-to-date | Views: 6 | Likes: 2 | Comments: 6 (Next check in 30s)
+2026-11-06 10:44:59 [INFO] ============================================================
+2026-11-06 10:44:59 [INFO] YOUTUBE AUTOMATION STARTED (PANEL MODE)
+2026-11-06 10:44:59 [INFO] Target Video ID : dINikoQUm6k
+2026-11-06 10:44:59 [INFO] Watch URL       : https://www.youtube.com/watch?v=dINikoQUm6k
+2026-11-06 10:44:59 [INFO] Check Interval  : 30 seconds
+2026-11-06 10:44:59 [INFO] GitHub Link     : https://github.com/diwaskhatri07
+2026-11-06 10:44:59 [INFO] Auto Reply      : ENABLED
+2026-11-06 10:44:59 [INFO] ============================================================
+2026-11-06 10:44:59 [INFO] Loaded credentials from 'token.pickle'.
+2026-11-06 10:44:59 [INFO] Connected to YouTube Data API successfully.
+2026-11-06 10:45:00 [INFO] [Cycle #1] 🔄 Updating Metadata -> Views: 6 | Likes: 2 | Comments: 6
+2026-11-06 10:45:00 [INFO] New Title: 'This Video Has 6 Views'
+2026-11-06 10:45:01 [INFO] [Cycle #1] ✅ Title and Description updated successfully!
+2026-11-06 10:45:32 [INFO] [Cycle #2] 🟢 Up-to-date | Views: 6 | Likes: 2 | Comments: 6 | Title: 'This Video Has 6 Views'
+2026-11-06 10:48:28 [INFO] ============================================================
+2026-11-06 10:48:28 [INFO] YOUTUBE AUTOMATION STARTED (PANEL MODE)
+2026-11-06 10:48:28 [INFO] Target Video ID : dINikoQUm6k
+2026-11-06 10:48:28 [INFO] Watch URL       : https://www.youtube.com/watch?v=dINikoQUm6k
+2026-11-06 10:48:28 [INFO] Check Interval  : 30 seconds
+2026-11-06 10:48:28 [INFO] GitHub Link     : https://github.com/diwaskhatri07
+2026-11-06 10:48:28 [INFO] Auto Reply      : ENABLED
+2026-11-06 10:48:28 [INFO] ============================================================
+2026-11-06 10:48:28 [INFO] Loaded credentials from 'token.pickle'.
+2026-11-06 10:48:28 [INFO] Connected to YouTube Data API successfully.
+2026-11-06 10:48:28 [INFO] [Cycle #1] 🔄 Updating Metadata -> Views: 7 | Likes: 2 | Comments: 6
+2026-11-06 10:48:28 [INFO] New Title: 'This Video Has 7 Views'
+2026-11-06 10:48:30 [INFO] [Cycle #1] ✅ Title and Description updated successfully!
+2026-11-06 10:49:00 [INFO] [Cycle #2] 🟢 Up-to-date | Views: 7 | Likes: 2 | Comments: 6 | Title: 'This Video Has 7 Views'
+2026-11-06 10:49:31 [INFO] [Cycle #3] 🟢 Up-to-date | Views: 7 | Likes: 2 | Comments: 6 | Title: 'This Video Has 7 Views'
+2026-11-06 10:50:01 [INFO] [Cycle #4] 🟢 Up-to-date | Views: 7 | Likes: 2 | Comments: 6 | Title: 'This Video Has 7 Views'
+2026-11-06 10:50:32 [INFO] [Cycle #5] 🔄 Updating Metadata -> Views: 8 | Likes: 2 | Comments: 6
+2026-11-06 10:50:32 [INFO] New Title: 'This Video Has 8 Views'
+2026-11-06 10:50:33 [INFO] [Cycle #5] ✅ Title and Description updated successfully!
+2026-11-06 10:51:04 [INFO] [Cycle #6] 🟢 Up-to-date | Views: 8 | Likes: 2 | Comments: 6 | Title: 'This Video Has 8 Views'
+2026-11-06 10:51:35 [INFO] [Cycle #7] 🟢 Up-to-date | Views: 8 | Likes: 2 | Comments: 6 | Title: 'This Video Has 8 Views'
+2026-11-06 10:52:05 [INFO] [Cycle #8] 🟢 Up-to-date | Views: 8 | Likes: 2 | Comments: 6 | Title: 'This Video Has 8 Views'
+2026-11-06 10:52:36 [INFO] [Cycle #9] 🟢 Up-to-date | Views: 8 | Likes: 2 | Comments: 6 | Title: 'This Video Has 8 Views'
+2026-11-06 10:53:07 [INFO] [Cycle #10] 🟢 Up-to-date | Views: 8 | Likes: 2 | Comments: 6 | Title: 'This Video Has 8 Views'
+2026-11-06 10:53:37 [INFO] [Cycle #11] 🟢 Up-to-date | Views: 8 | Likes: 2 | Comments: 6 | Title: 'This Video Has 8 Views'
+2026-11-06 10:54:57 [INFO] ============================================================
+2026-11-06 10:54:57 [INFO] YOUTUBE AUTOMATION STARTED (PANEL MODE)
+2026-11-06 10:54:57 [INFO] Target Video ID : dINikoQUm6k
+2026-11-06 10:54:57 [INFO] Watch URL       : https://www.youtube.com/watch?v=dINikoQUm6k
+2026-11-06 10:54:57 [INFO] Check Interval  : 30 seconds
+2026-11-06 10:54:57 [INFO] GitHub Link     : https://github.com/diwaskhatri07
+2026-11-06 10:54:57 [INFO] Auto Reply      : ENABLED
+2026-11-06 10:54:57 [INFO] ============================================================
+2026-11-06 10:54:57 [INFO] Loaded credentials from 'token.pickle'.
+2026-11-06 10:54:57 [INFO] Connected to YouTube Data API successfully.
+2026-11-06 10:54:57 [INFO] [Cycle #1] 🔄 Updating Metadata -> Views: 8 | Likes: 2 | Comments: 6
+2026-11-06 10:54:57 [INFO] New Title: 'This Video Has 8 Views'
+2026-11-06 10:54:59 [INFO] [Cycle #1] ✅ Title and Description updated successfully!
+2026-11-06 10:55:30 [INFO] [Cycle #2] 🟢 Up-to-date | Views: 8 | Likes: 2 | Comments: 6 | Title: 'This Video Has 8 Views'
+2026-11-06 10:56:01 [INFO] [Cycle #3] 🟢 Up-to-date | Views: 8 | Likes: 2 | Comments: 6 | Title: 'This Video Has 8 Views'
+2026-11-06 10:56:32 [INFO] [Cycle #4] 🟢 Up-to-date | Views: 8 | Likes: 2 | Comments: 6 | Title: 'This Video Has 8 Views'
+2026-11-06 10:57:03 [INFO] [Cycle #5] 🔄 Updating Metadata -> Views: 8 | Likes: 3 | Comments: 7
+2026-11-06 10:57:03 [INFO] New Title: 'This Video Has 8 Views'
+2026-11-06 10:57:04 [INFO] [Cycle #5] ✅ Title and Description updated successfully!
+2026-11-06 10:57:05 [INFO] Found new comment from @gatewaymaker: 'Hi Diwas'. Sending auto-reply...
+2026-11-06 10:57:05 [INFO] Auto-reply sent successfully to @gatewaymaker!
+2026-11-06 10:57:36 [INFO] [Cycle #6] 🔄 Updating Metadata -> Views: 8 | Likes: 3 | Comments: 8
+2026-11-06 10:57:36 [INFO] New Title: 'This Video Has 8 Views'
+2026-11-06 10:57:38 [INFO] [Cycle #6] ✅ Title and Description updated successfully!
+2026-11-06 10:58:09 [INFO] [Cycle #7] 🟢 Up-to-date | Views: 8 | Likes: 3 | Comments: 8 | Title: 'This Video Has 8 Views'
+2026-11-06 10:58:40 [INFO] [Cycle #8] 🟢 Up-to-date | Views: 8 | Likes: 3 | Comments: 8 | Title: 'This Video Has 8 Views'
+2026-11-06 10:59:11 [INFO] [Cycle #9] 🔄 Updating Metadata -> Views: 9 | Likes: 3 | Comments: 9
+2026-11-06 10:59:11 [INFO] New Title: 'This Video Has 9 Views'
+2026-11-06 10:59:13 [INFO] [Cycle #9] ✅ Title and Description updated successfully!
+2026-11-06 10:59:14 [INFO] Found new comment from @GunLemg: 'Hi'. Sending auto-reply...
+2026-11-06 10:59:15 [INFO] Auto-reply sent successfully to @GunLemg!
+2026-11-06 10:59:45 [INFO] [Cycle #10] 🔄 Updating Metadata -> Views: 9 | Likes: 3 | Comments: 11
+2026-11-06 10:59:45 [INFO] New Title: 'This Video Has 9 Views'
+2026-11-06 10:59:47 [INFO] [Cycle #10] ✅ Title and Description updated successfully!
+2026-11-06 10:59:47 [INFO] Found new comment from @GunLemg: 'hi bro'. Sending auto-reply...
+2026-11-06 10:59:48 [INFO] Auto-reply sent successfully to @GunLemg!
+2026-11-06 11:00:19 [INFO] [Cycle #11] 🔄 Updating Metadata -> Views: 9 | Likes: 3 | Comments: 12
+2026-11-06 11:00:19 [INFO] New Title: 'This Video Has 9 Views'
+2026-11-06 11:00:20 [INFO] [Cycle #11] ✅ Title and Description updated successfully!
+2026-11-06 11:00:51 [INFO] [Cycle #12] 🟢 Up-to-date | Views: 9 | Likes: 3 | Comments: 12 | Title: 'This Video Has 9 Views'
+2026-11-06 11:01:22 [INFO] [Cycle #13] 🔄 Updating Metadata -> Views: 10 | Likes: 3 | Comments: 12
+2026-11-06 11:01:22 [INFO] New Title: 'This Video Has 10 Views'
+2026-11-06 11:01:23 [INFO] [Cycle #13] ✅ Title and Description updated successfully!
+2026-11-06 11:01:54 [INFO] [Cycle #14] 🔄 Updating Metadata -> Views: 11 | Likes: 3 | Comments: 12
+2026-11-06 11:01:54 [INFO] New Title: 'This Video Has 11 Views'
+2026-11-06 11:01:56 [INFO] [Cycle #14] ✅ Title and Description updated successfully!
+2026-11-06 11:02:27 [INFO] [Cycle #15] 🟢 Up-to-date | Views: 11 | Likes: 3 | Comments: 12 | Title: 'This Video Has 11 Views'
+2026-11-06 11:02:57 [INFO] [Cycle #16] 🔄 Updating Metadata -> Views: 11 | Likes: 3 | Comments: 15
+2026-11-06 11:02:57 [INFO] New Title: 'This Video Has 11 Views'
+2026-11-06 11:02:59 [INFO] [Cycle #16] ✅ Title and Description updated successfully!
+2026-11-06 11:10:02 [INFO] ============================================================
+2026-11-06 11:10:02 [INFO] YOUTUBE ADVANCED BOT STARTED (PANEL MODE)
+2026-11-06 11:10:02 [INFO] Target Video ID : dINikoQUm6k
+2026-11-06 11:10:02 [INFO] Watch URL       : https://www.youtube.com/watch?v=dINikoQUm6k
+2026-11-06 11:10:02 [INFO] Check Interval  : 30 seconds
+2026-11-06 11:10:02 [INFO] GitHub Link     : https://github.com/diwaskhatri07
+2026-11-06 11:10:02 [INFO] Auto Reply      : ENABLED
+2026-11-06 11:10:02 [INFO] Features Active : Top Comment, Latest Comments, Goals, Uptime
+2026-11-06 11:10:02 [INFO] ============================================================
+2026-11-06 11:10:02 [INFO] Loaded credentials from 'token.pickle'.
+2026-11-06 11:10:02 [INFO] Connected to YouTube Data API successfully.
+2026-11-06 11:10:02 [INFO] [Cycle #1] 🔄 Updating Metadata -> Views: 14 | Likes: 3 | Comments: 15
+2026-11-06 11:10:03 [INFO] Title: 'This Video Has 14 Views'
+2026-11-06 11:10:04 [INFO] [Cycle #1] ✅ Title and Description updated successfully!

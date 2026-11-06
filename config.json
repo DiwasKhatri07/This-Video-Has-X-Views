@@ -1,0 +1,11 @@
+{
+    "video_id": "dINikoQUm6k",
+    "check_interval": 30,
+    "github_url": "https://github.com/diwaskhatri07",
+    "auto_reply_enabled": true,
+    "show_top_comment": true,
+    "show_latest_comments": true,
+    "show_progress_bars": true,
+    "show_uptime_and_milestones": true,
+    "max_comments_in_description": 3
+}

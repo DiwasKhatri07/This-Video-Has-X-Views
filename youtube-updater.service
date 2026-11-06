@@ -1,0 +1,17 @@
+[Unit]
+Description=YouTube Dynamic Title & Views Automation Service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/youtube-views
+ExecStart=/opt/youtube-views/.venv/bin/python main.py
+Restart=always
+RestartSec=10
+Environment=PYTHONUNBUFFERED=1
+StandardOutput=append:/opt/youtube-views/automation.log
+StandardError=append:/opt/youtube-views/automation.log
+
+[Install]
+WantedBy=multi-user.target
