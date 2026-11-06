@@ -130,6 +130,8 @@ All parameters are managed through `config.json` with zero required CLI prompts:
 
 The workflow (`.github/workflows/youtube-updater.yml`) polls YouTube stats about every five minutes and commits metrics only when values change. Each workflow execution runs one cycle and exits; that is expected. GitHub Actions is not an always-on host and does not provide 30-second scheduling. Scheduled starts can also be delayed.
 
+Code pushes and pull requests run the separate syntax-only CI workflow (`.github/workflows/ci.yml`) without needing YouTube credentials. This validates code but does not deploy it to a VPS.
+
 Add a repository Actions secret named `YOUTUBE_TOKEN_PICKLE_B64` containing the base64-encoded OAuth token file. Never commit `token.pickle` or `client_secret.json`. Rotate/revoke any OAuth credentials that were previously published before relying on the new secret.
 
 ### Option B: Server Panels (Pterodactyl / aaPanel / cPanel)

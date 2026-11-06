@@ -4,14 +4,6 @@ on:
   schedule:
     - cron: "*/5 * * * *" # GitHub Actions scheduling is not a 30-second daemon.
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - "README.md"
-      - "badges/**"
-      - "metrics.json"
-      - "replied_comments.json"
 
 permissions:
   contents: write
