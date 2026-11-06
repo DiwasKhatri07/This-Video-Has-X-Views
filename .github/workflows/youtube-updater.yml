@@ -1,0 +1,51 @@
+# =============================================================================
+#  🤖 YouTube Live Title Bot — GitHub Actions Workflow
+#  Runs every 5 minutes via cron on GitHub Actions
+#  Fetches live YouTube stats and updates video Title + Description
+# =============================================================================
+
+name: 🤖 YouTube Live Stats Updater
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # Every 5 minutes (GitHub Actions cron minimum)
+  workflow_dispatch:         # Manual trigger button from GitHub UI
+
+jobs:
+  update-youtube:
+    name: 📊 Sync YouTube Stats
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 📦 Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: 🔐 Restore OAuth Token
+        run: echo "${{ secrets.YOUTUBE_TOKEN_PICKLE_B64 }}" | base64 -d > token.pickle
+
+      - name: 🔑 Restore Client Secret
+        run: echo "${{ secrets.YOUTUBE_CLIENT_SECRET_JSON }}" > client_secret.json
+
+      - name: 🚀 Run YouTube Updater (Single Cycle)
+        env:
+          RUN_ONCE: "true"
+        run: python main.py
+
+      - name: 📤 Save Updated Replied Comments Cache
+        if: always()
+        run: |
+          if [ -f replied_comments.json ]; then
+            git config user.name "YouTube Bot"
+            git config user.email "bot@diwaskhatri.dev"
+            git add replied_comments.json
+            git diff --cached --quiet || git commit -m "🤖 Auto-update replied comments cache"
+            git push
+          fi

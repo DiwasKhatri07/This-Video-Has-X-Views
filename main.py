@@ -103,9 +103,12 @@ def load_config():
 
 
 def run_automation():
-    """Main loop for server panel execution."""
+    """Main loop for server panel and GitHub Actions execution."""
     global running
     start_time = datetime.now()
+
+    # GitHub Actions: Run single cycle and exit
+    run_once = os.getenv("RUN_ONCE", "").lower() in ("true", "1", "yes")
 
     config = load_config()
     video_id = config.get("video_id", "dINikoQUm6k").strip()
@@ -211,6 +214,11 @@ def run_automation():
             logger.error("[API ERROR] %s. Sleeping for %ds...", api_err, check_interval)
         except Exception as err:
             logger.error("[ERROR] Unexpected error: %s", err, exc_info=False)
+
+        # GitHub Actions: exit after single cycle
+        if run_once:
+            logger.info("RUN_ONCE mode: Single cycle completed. Exiting.")
+            break
 
         cycle += 1
 
