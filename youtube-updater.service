@@ -11,6 +11,7 @@ Restart=always
 RestartSec=10
 Environment=PYTHONUNBUFFERED=1
 Environment=SYNC_GITHUB_METRICS=false
+Environment=METADATA_UPDATE_INTERVAL_SECONDS=3600
 StandardOutput=append:/opt/youtube-views/automation.log
 StandardError=append:/opt/youtube-views/automation.log
 

@@ -27,6 +27,16 @@ logger = logging.getLogger("YouTubeAutomation")
 REPLIED_COMMENTS_FILE = "replied_comments.json"
 
 
+def is_youtube_quota_error(error) -> bool:
+    """Return whether a YouTube API exception indicates exhausted quota."""
+    message = str(error).lower()
+    return (
+        "quotaexceeded" in message
+        or "dailylimitexceeded" in message
+        or ("quota" in message and "exceed" in message)
+    )
+
+
 def load_replied_comments():
     """Loads comment IDs that have already received an auto-reply."""
     if os.path.exists(REPLIED_COMMENTS_FILE):
@@ -120,6 +130,8 @@ def get_all_comments_data(youtube, video_id: str, max_results: int = 3):
             top_comment = max(liked_comments, key=lambda c: c["likes"])
 
     except HttpError as e:
+        if is_youtube_quota_error(e):
+            raise RuntimeError(f"YouTube API quota exceeded while fetching comments: {e}") from e
         logger.warning("Could not fetch comments (might be disabled): %s", e)
 
     latest_comments = comments_list[:max_results]
@@ -305,10 +317,12 @@ def process_smart_comment_replies(
 
                 except HttpError as e:
                     logger.error("Failed to post reply to %s: %s", author, e)
-                    replied_ids.add(comment_id)
-                    save_replied_comments(replied_ids)
+                    if is_youtube_quota_error(e):
+                        raise RuntimeError(f"YouTube API quota exceeded while posting a reply: {e}") from e
 
     except HttpError as e:
+        if is_youtube_quota_error(e):
+            raise RuntimeError(f"YouTube API quota exceeded while checking replies: {e}") from e
         logger.warning("Error checking comments for replies: %s", e)
 
 

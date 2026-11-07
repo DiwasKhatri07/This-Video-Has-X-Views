@@ -198,7 +198,9 @@ YouTube Data API v3 provides a complimentary tier of **10,000 quota units per da
 - `videos.update` (updating title/description): **50 units**
 - `comments.insert` (auto-replying): **50 units**
 
-The 30-second daemon makes about 5,760 read units per day when it performs one video-stat request and one comment-list request per cycle. The five-minute GitHub metrics workflow adds about 288 stat reads per day. Metadata updates and auto-replies cost 50 units each, so their frequency must remain low enough for the project's daily quota. The daemon now avoids a fixed metadata update every five minutes and reuses the same fetched comments for reply detection. High activity can still exhaust quota; watch Google Cloud's quota dashboard.
+The 30-second daemon makes about 5,760 read units per day when it performs one video-stat request and one comment-list request per cycle. The five-minute GitHub metrics workflow adds about 288 stat reads per day. The service limits `videos.update` metadata writes to at most once per hour by default (1,200 units/day maximum); replies still cost 50 units each. The hourly cap can be changed with `METADATA_UPDATE_INTERVAL_SECONDS`, but lowering it can exhaust the daily limit. The timestamp is stored in the ignored local file `metadata_update_state.json` so restarts do not reset the cap.
+
+When YouTube returns `quotaExceeded`, the daemon now pauses API requests for one hour by default (`QUOTA_BACKOFF_SECONDS` can override this, with a five-minute minimum). This prevents a 30-second retry loop, but it does not restore quota. Wait for the Google Cloud project's daily quota reset or request a quota review/increase; check the YouTube Data API quota dashboard to identify which project is being used.
 
 ---
 

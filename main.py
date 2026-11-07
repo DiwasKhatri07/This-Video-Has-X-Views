@@ -22,6 +22,7 @@ from title import (
     get_video_stats,
     get_all_comments_data,
     process_smart_comment_replies,
+    is_youtube_quota_error,
     format_dynamic_title,
     build_dynamic_description,
     update_video_metadata
@@ -34,6 +35,35 @@ except Exception:
 
 CONFIG_FILE = "config.json"
 LOG_FILE = "automation.log"
+METADATA_STATE_FILE = "metadata_update_state.json"
+
+
+def get_quota_backoff_seconds():
+    """Return a conservative pause after quota exhaustion; default is one hour."""
+    try:
+        configured = int(os.getenv("QUOTA_BACKOFF_SECONDS", "3600"))
+    except ValueError:
+        configured = 3600
+    return max(300, configured)
+
+
+def load_last_metadata_update():
+    """Load the last successful metadata-write timestamp from local runtime state."""
+    try:
+        with open(METADATA_STATE_FILE, "r", encoding="utf-8") as f:
+            return float(json.load(f)["last_update_epoch"])
+    except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError):
+        return None
+
+
+def save_last_metadata_update(timestamp):
+    """Persist the last successful metadata-write timestamp across restarts."""
+    try:
+        with open(METADATA_STATE_FILE, "w", encoding="utf-8") as f:
+            json.dump({"last_update_epoch": timestamp}, f)
+    except OSError as error:
+        logger.warning("Could not save metadata write state: %s", error)
+
 
 # Ensure UTF-8 output across all server panels and terminals
 if hasattr(sys.stdout, "reconfigure"):
@@ -119,6 +149,10 @@ def run_automation():
     config = load_config()
     video_id = config.get("video_id", "dINikoQUm6k").strip()
     check_interval = int(config.get("check_interval", 30))
+    try:
+        metadata_update_interval = max(0, int(os.getenv("METADATA_UPDATE_INTERVAL_SECONDS", "3600")))
+    except ValueError:
+        metadata_update_interval = 3600
     github_url = config.get("github_url", "https://github.com/diwaskhatri07")
     auto_reply = config.get("auto_reply_enabled", True)
     max_comments = int(config.get("max_comments_in_description", 3))
@@ -128,6 +162,7 @@ def run_automation():
     logger.info("Target Video ID : %s", video_id)
     logger.info("Watch URL       : https://www.youtube.com/watch?v=%s", video_id)
     logger.info("Check Interval  : %d seconds", check_interval)
+    logger.info("Metadata write minimum interval: %d seconds", metadata_update_interval)
     logger.info("GitHub Link     : %s", github_url)
     logger.info("Auto Reply      : %s", "ENABLED" if auto_reply and not metrics_only else "DISABLED")
     logger.info("Metrics-only mode: %s", "ENABLED" if metrics_only else "DISABLED")
@@ -142,9 +177,11 @@ def run_automation():
     last_likes = None
     last_comment_count = None
     last_latest_comment_ids = None
+    last_metadata_update = load_last_metadata_update()
     cycle = 1
 
     while running:
+        sleep_seconds = check_interval
         try:
             # 1. Fetch live video statistics
             stats = get_video_stats(youtube, video_id)
@@ -191,8 +228,12 @@ def run_automation():
                     or current_comment_ids != last_latest_comment_ids
                     or current_title != expected_title
                 )
+                metadata_write_allowed = (
+                    last_metadata_update is None
+                    or time.time() - last_metadata_update >= metadata_update_interval
+                )
 
-                if needs_update:
+                if needs_update and metadata_write_allowed:
                     logger.info(
                         "[Cycle #%d] 🔄 Updating Metadata -> Views: %d | Likes: %d | Comments: %d",
                         cycle, views, likes, comments_count
@@ -213,6 +254,8 @@ def run_automation():
                         last_likes = likes
                         last_comment_count = comments_count
                         last_latest_comment_ids = current_comment_ids
+                        last_metadata_update = time.time()
+                        save_last_metadata_update(last_metadata_update)
 
                         # Keep local metric files in sync unless this host is configured
                         # to leave publishing to the scheduled GitHub Actions workflow.
@@ -224,6 +267,11 @@ def run_automation():
                                 logger.warning("Could not sync GitHub metrics: %s", sync_err)
                     else:
                         logger.warning("[Cycle #%d] ⚠️ Update did not confirm.", cycle)
+                elif needs_update:
+                    logger.info(
+                        "[Cycle #%d] Metadata changed; deferring videos.update until the %d-second quota-safe interval elapses.",
+                        cycle, metadata_update_interval
+                    )
                 else:
                     logger.info(
                         "[Cycle #%d] 🟢 Up-to-date | Views: %d | Likes: %d | Comments: %d | Title: '%s'",
@@ -238,9 +286,25 @@ def run_automation():
                     )
 
         except HttpError as api_err:
-            logger.error("[API ERROR] %s. Sleeping for %ds...", api_err, check_interval)
+            if is_youtube_quota_error(api_err):
+                sleep_seconds = get_quota_backoff_seconds()
+                logger.error(
+                    "YouTube API quota is exhausted; pausing requests for %ds. "
+                    "The quota must reset or be increased before polling can resume.",
+                    sleep_seconds
+                )
+            else:
+                logger.error("[API ERROR] %s. Sleeping for %ds...", api_err, check_interval)
         except Exception as err:
-            logger.error("[ERROR] Unexpected error: %s", err, exc_info=False)
+            if is_youtube_quota_error(err):
+                sleep_seconds = get_quota_backoff_seconds()
+                logger.error(
+                    "YouTube API quota is exhausted; pausing requests for %ds. "
+                    "The quota must reset or be increased before polling can resume.",
+                    sleep_seconds
+                )
+            else:
+                logger.error("[ERROR] Unexpected error: %s", err, exc_info=False)
 
         # GitHub Actions: exit after single cycle
         if run_once:
@@ -251,7 +315,7 @@ def run_automation():
 
         # Sleep with 1-second check for immediate responsive shutdown
         elapsed = 0
-        while elapsed < check_interval and running:
+        while elapsed < sleep_seconds and running:
             time.sleep(1)
             elapsed += 1
 
